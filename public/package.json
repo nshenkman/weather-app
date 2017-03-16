@@ -1,0 +1,19 @@
+{
+  "name": "weather-app",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "async": "2.1.5",
+    "body-parser": "^1.0.2",
+    "bootstrap-validator": "^0.11.9",
+    "error-handler": "^0.1.4",
+    "express": "~4.1.1",
+    "method-override": "^1.0.0",
+    "morgan": "^1.0.0",
+    "mustache": "2.3.0",
+    "mysql": "2.13.0 ",
+    "node-schedule": "1.2.0",
+    "nodemailer": "3.1.5",
+    "request": "2.81.0"
+  }
+}
