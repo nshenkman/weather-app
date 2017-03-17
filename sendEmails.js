@@ -71,6 +71,8 @@ exports.sendEmails = function(email, pass, callback){
             mailOptions.html = html;
             mailOptions.to = accountWeather.email;
             transporter.sendMail(mailOptions, callback)
+          } else {
+            callback()
           }
         }, callback)
       }]

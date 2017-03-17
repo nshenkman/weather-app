@@ -5,7 +5,7 @@ var connection = require('../app').getConnection;
 var async = require('async');
 var request = require('request');
 
-
+// ANY USE OF ? IN SQL QUERIES AUTOMATICALLY ESCAPES CHARACTERS
 exports.account  =
   {
     emailCheck : function(req, res) {
@@ -13,16 +13,20 @@ exports.account  =
         connection : connection,
         getAccount : ['connection', function(results, callback) {
           var connection = results.connection;
-          var email = decodeURI(req.query.email);
-          connection.query('SELECT email, location_link as locationLink, location_name as locationName FROM weather_app.accounts WHERE email = ? LIMIT 1', connection.escape(email), function(err, account) {
-            connection.release();
-            callback(err, account)
-          })
+          if (!req.query.email) {
+            callback(400, null)
+          } else {
+            var email = decodeURI(req.query.email);
+            connection.query('SELECT email, location_link as locationLink, location_name as locationName FROM weather_app.accounts WHERE email = ? LIMIT 1', email, function(err, account) {
+              callback(err, account)
+            })
+          }
         }]
       }, function(err, results) {
+        results.connection.release();
         if (err) {
-          console.log(err);
-          res.send(500)
+          err = typeof err ==='number' ? err : 500;
+          res.send(err)
         } else if (results.getAccount.length == 1) {
           res.send(400)
         } else {
@@ -35,19 +39,27 @@ exports.account  =
         connection : connection,
         createAccount : ['connection', function(results, callback) {
           var connection = results.connection;
-          var account = {};
-          account.email = connection.escape(req.body.email);
-          account.location_link = connection.escape(req.body.locationLink);
-          account.location_name = connection.escape(req.body.locationName);
-          connection.query('INSERT INTO weather_app.accounts SET ?', account, function(err, results) {
-            connection.release();
-            callback(err, results)
-          })
+          if (req.body && req.body.email && req.body.locationLink && req.body.locationName) {
+            var account = {};
+            account.email = req.body.email;
+            account.location_link = req.body.locationLink;
+            account.location_name = req.body.locationName;
+            connection.query('INSERT INTO weather_app.accounts SET ?', account, function(err, results) {
+              if (err && err.code == 'ER_DUP_ENTRY') {
+                callback(409, null)
+              } else {
+                callback(err, results)
+              }
+            })
+          } else {
+            callback(400, null)
+          }
         }]
-      }, function(err) {
+      }, function(err, results) {
+        results.connection.release();
         if (err) {
-          console.log(err);
-          res.send(500)
+          err = typeof err ==='number' ? err : 500;
+          res.send(err)
         } else {
           res.send(200)
         }
@@ -84,8 +96,12 @@ exports.wunderground = function() {
           res.send(500)
         } else {
           var cities = results.getCities;
-          cities = JSON.parse(cities).RESULTS;
-          res.json(cities)
+          cities = JSON.parse(cities);
+          if (cities.error) {
+            res.send(503)
+          } else {
+            res.json(cities.RESULTS)
+          }
         }
       })
     },

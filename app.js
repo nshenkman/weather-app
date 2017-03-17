@@ -27,12 +27,13 @@ var dbOptions = {
   database : 'weather_app'
 };
 // local only
-if (env === 'local') {
+if (env === 'local' || env === 'test') {
   app.use(errorHandler());
   dbOptions.host = 'localhost';
   dbOptions.user = 'root';
   dbOptions.port = 3307;
 }
+
 
 // production only
 if (env === 'production') {
@@ -95,9 +96,9 @@ http.createServer(app).listen(app.get('port'), function () {
   console.log('Express server listening on port ' + app.get('port'));
 });
 
-
 // var rule = new cron.RecurrenceRule();
-// rule.hour = 9;
+// EAST COAST TIME
+// rule.hour = 8;
 // cron.scheduleJob(rule, function(){
 //   sendEmails.sendEmails(email, pass, function(err, res) {
 //     console.log(err)

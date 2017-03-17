@@ -21,7 +21,6 @@ angular.module('weatherApp.controllers', [])
         }
       }
     });
-
     $scope.search = function() {
       $scope.noCities = false;
       $scope.loading = true;
