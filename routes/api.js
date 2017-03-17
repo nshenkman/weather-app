@@ -9,12 +9,12 @@ var request = require('request');
 exports.account  =
   {
     emailCheck : function(req, res) {
-      var email = decodeURI(req.query.email);
       async.auto({
         connection : connection,
         getAccount : ['connection', function(results, callback) {
           var connection = results.connection;
-          connection.query('SELECT email, location_link as locationLink, location_name as locationName FROM weather_app.accounts WHERE email = ? LIMIT 1', email, function(err, account) {
+          var email = decodeURI(req.query.email);
+          connection.query('SELECT email, location_link as locationLink, location_name as locationName FROM weather_app.accounts WHERE email = ? LIMIT 1', connection.escape(email), function(err, account) {
             connection.release();
             callback(err, account)
           })
@@ -31,14 +31,14 @@ exports.account  =
       })
     },
     post : function(req, res) {
-      var account = {};
-      account.email = req.body.email;
-      account.location_link = req.body.locationLink;
-      account.location_name = req.body.locationName;
       async.auto({
         connection : connection,
         createAccount : ['connection', function(results, callback) {
           var connection = results.connection;
+          var account = {};
+          account.email = connection.escape(req.body.email);
+          account.location_link = connection.escape(req.body.locationLink);
+          account.location_name = connection.escape(req.body.locationName);
           connection.query('INSERT INTO weather_app.accounts SET ?', account, function(err, results) {
             connection.release();
             callback(err, results)
@@ -55,8 +55,14 @@ exports.account  =
     }
   };
 
-exports.wunderground =
-  {
+exports.wunderground = function() {
+  var self;
+  return {
+    init : function(apiKey) {
+      self = this;
+      self.apiKey = apiKey;
+      return self;
+    },
     getCities : function(req, res) {
       var qs = req.query;
       async.auto({
@@ -84,13 +90,13 @@ exports.wunderground =
       })
     },
     get : function(type, urlRoute, callback) {
+      var apiKey = self.apiKey;
       async.auto({
         request : function(callback) {
           var options = {
-            url : 'http://api.wunderground.com/api/142236cd1b398b92/'+ type + urlRoute + '.json',
+            url : 'http://api.wunderground.com/api/'+apiKey+'/'+ type + urlRoute + '.json',
             method : 'GET'
           };
-
           request(options, function(err, response, body) {
             callback(err, body)
           })
@@ -106,3 +112,5 @@ exports.wunderground =
       })
     }
   };
+};
+

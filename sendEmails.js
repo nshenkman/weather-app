@@ -1,7 +1,7 @@
 'use strict';
 exports.sendEmails = function(email, pass, callback){
   var connection = require('./app').getConnection;
-  var api = require('./routes/api');
+  var wunderground = require('./app').wunderground;
   var nodemailer = require('nodemailer');
   var async = require('async');
   var mustache = require('mustache');
@@ -37,8 +37,8 @@ exports.sendEmails = function(email, pass, callback){
         var accounts = results.findAccounts;
         async.map(accounts, function(account, callback) {
           async.parallel({
-            averageForecast : async.apply(api.wunderground.get, 'almanac', account.location_link),
-            currentForecast : async.apply(api.wunderground.get, 'conditions', account.location_link)
+            averageForecast : async.apply(wunderground.get, 'almanac', account.location_link),
+            currentForecast : async.apply(wunderground.get, 'conditions', account.location_link)
           }, function(err, weatherData) {
             if (err) {
               callback()
