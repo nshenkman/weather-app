@@ -1,7 +1,11 @@
 {
-  "name": "weather-app",
+  "name": "klaviyo-weather-app",
   "version": "0.0.1",
   "private": true,
+  "engines": {
+    "node": "6.8.0",
+    "npm" : "3.10.8"
+  },
   "dependencies": {
     "async": "2.1.5",
     "body-parser": "^1.0.2",
@@ -15,5 +19,8 @@
     "node-schedule": "1.2.0",
     "nodemailer": "3.1.5",
     "request": "2.81.0"
+  },
+  "scripts": {
+    "start": "EMAIL=nikita.shenkman@gmail.com PASS=willnotforget node app.js"
   }
 }
