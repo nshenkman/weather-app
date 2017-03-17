@@ -96,12 +96,12 @@ http.createServer(app).listen(app.get('port'), function () {
   console.log('Express server listening on port ' + app.get('port'));
 });
 
-// var rule = new cron.RecurrenceRule();
-// EAST COAST TIME
-// rule.hour = 8;
-// cron.scheduleJob(rule, function(){
-//   sendEmails.sendEmails(email, pass, function(err, res) {
-//     console.log(err)
-//   })
-// });
+var rule = new cron.RecurrenceRule();
+//EAST COAST TIME
+rule.hour = 8;
+cron.scheduleJob(rule, function(){
+  sendEmails.sendEmails(email, pass, function(err, res) {
+    console.log(err)
+  })
+});
 
