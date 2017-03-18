@@ -64,6 +64,43 @@ exports.account  =
           res.send(200)
         }
       })
+    },
+    delete : function(req, res) {
+      async.auto({
+        connection : connection,
+        createAccount : ['connection', function(results, callback) {
+          var connection = results.connection;
+          if (req.query.email) {
+            var email = req.query.email;
+            connection.query('DELETE FROM weather_app.accounts WHERE email = ?', email, function (err, results) {
+              console.log(results.affectedRows)
+              if (results.affectedRows == 0) {
+                callback(404, null)
+              } else {
+                callback()
+              }
+            })
+          } else {
+            callback(400, null)
+          }
+        }]
+      }, function(err, results) {
+        results.connection.release();
+        if (err) {
+          err = typeof err ==='number' ? err : 500;
+          var reason;
+          if (err == 400) {
+            reason = 'Email paramter missing'
+          } else if (err == 404) {
+            reason = 'Email not found'
+          } else if (500) {
+            reason = 'Internal server error'
+          }
+          res.status(err).send({status : 'failed', reason : reason})
+        } else {
+          res.status(300).send({status : 'success'})
+        }
+      })
     }
   };
 

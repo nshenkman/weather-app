@@ -1,5 +1,5 @@
 'use strict';
-exports.sendEmails = function(email, pass, callback){
+exports.sendEmails = function(email, pass, domain, callback){
   var connection = require('./app').getConnection;
   var wunderground = require('./app').wunderground;
   var nodemailer = require('nodemailer');
@@ -22,6 +22,8 @@ exports.sendEmails = function(email, pass, callback){
     low : {subject : "Not so nice out? That's okay, enjoy a discount on us.", template : '<p>In {{location_name}} the weather is {{forecast.temp}} degrees and {{forecast.weather}}.</p>'},
     normal : {subject : "Enjoy a discount on us.", template : '<p>In {{location_name}} the weather is {{forecast.temp}} degrees and {{forecast.weather}}.</p>'}
   };
+
+  var unsubscribe = '<p style="font-size:8px;">If you are no longer interested, you can <a href="'+domain+'/api/account/unsubscribe">unsubscribe</a></p>';
 
   async.auto(
     {
@@ -67,6 +69,7 @@ exports.sendEmails = function(email, pass, callback){
               weatherType = 'low'
             }
             var html = mustache.render(weatherTemplates[weatherType].template, accountWeather);
+            html += unsubscribe;
             mailOptions.subject = weatherTemplates[weatherType].subject;
             mailOptions.html = html;
             mailOptions.to = accountWeather.email;

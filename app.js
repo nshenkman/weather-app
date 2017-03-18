@@ -21,6 +21,8 @@ var host = process.env.DB_HOST;
 var dbUser = process.env.DB_USER;
 var dbPass = process.env.DB_PASS;
 var wundergroundApiKey = process.env.WUNDERGROUND_API_KEY;
+var domain = process.env.DOMAIN;
+
 
 var dbOptions = {
   database : 'weather_app',
@@ -80,6 +82,8 @@ app.get('/', routes.index);
 app.post('/api/account', api.account.post);
 app.get('/api/email-check', api.account.emailCheck);
 app.get('/api/cities', wunderground.getCities);
+app.get('/api/account/unsubscribe', api.account.delete);
+
 
 
 
@@ -99,7 +103,7 @@ var rule = new cron.RecurrenceRule();
 //EAST COAST TIME
 rule.hour = 8;
 cron.scheduleJob(rule, function(){
-  sendEmails.sendEmails(email, pass, function(err, res) {
+  sendEmails.sendEmails(email, pass, domain, function(err, res) {
     console.log(err)
   })
 });
