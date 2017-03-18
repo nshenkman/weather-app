@@ -37,13 +37,14 @@ if (env === 'local' || env === 'test') {
 if (env === 'production') {
   dbOptions.host = host;
   dbOptions.user = dbUser;
-  dbOptions.pass = dbPass;
+  dbOptions.password = dbPass;
 }
 
 var pool = mysql.createPool(dbOptions);
 
 module.exports.getConnection =  function(callback) {
   pool.getConnection(function(err, connection){
+    console.log(err)
     callback(err, connection)
   })
 };
