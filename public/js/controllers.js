@@ -41,7 +41,7 @@ angular.module('weatherApp.controllers', [])
       }).
       error(function (data, status, headers, config) {
         $scope.loading = false;
-
+        $scope.error = true;
       });
     };
     $scope.nextPage = function() {
@@ -74,6 +74,7 @@ angular.module('weatherApp.controllers', [])
         $scope.success = true
       }).
       error(function (data, status, headers, config) {
+        $scope.error = true;
       });
     };
   });

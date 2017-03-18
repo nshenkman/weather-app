@@ -23,10 +23,11 @@
         <div class="form-group has-feedback">
             <label for="email" class="control-label">Email Address</label>
             <input id="email" type="email" name="email" class="form-control" placeholder="Email" ng-model="account.email"
+                   autocomplete="email"
                    data-error="This email address is invalid."
                    data-remote-error="This email address is already subscribed."
                    data-remote="/api/email-check"
-                   data-delay="1000" required>
+                   required>
             <div class="help-block with-errors"></div>
         </div>
         <div class="form-group has-feedback">
@@ -59,8 +60,11 @@
         </div>
     </form>
 </div>
-<div ng-show="success" class="App">
+<div ng-show="success" class="App container">
     <h2><b>{{account.email}}</b> successfully subscribed to daily weather notifications for <b>{{city.name}}</b></h2>
+</div>
+<div ng-show="error" class="App container">
+    <h2>Unfortunately an error occured. Please refresh the page and try again</h2>
 </div>
 </body>
 </html>

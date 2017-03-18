@@ -7,7 +7,6 @@ var express = require('express'),
   cron = require('node-schedule'),
   bodyParser = require('body-parser'),
   methodOverride = require('method-override'),
-  errorHandler = require('express-error-handler'),
   morgan = require('morgan'),
   http = require('http'),
   path = require('path'),
@@ -28,7 +27,6 @@ var dbOptions = {
 };
 // local only
 if (env === 'local' || env === 'test') {
-  app.use(errorHandler());
   dbOptions.host = 'localhost';
   dbOptions.user = 'root';
   dbOptions.port = 3307;
