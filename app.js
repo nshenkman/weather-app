@@ -23,7 +23,8 @@ var dbPass = process.env.DB_PASS;
 var wundergroundApiKey = process.env.WUNDERGROUND_API_KEY;
 
 var dbOptions = {
-  database : 'weather_app'
+  database : 'weather_app',
+  port : 3306
 };
 // local only
 if (env === 'local' || env === 'test') {
@@ -44,7 +45,6 @@ var pool = mysql.createPool(dbOptions);
 
 module.exports.getConnection =  function(callback) {
   pool.getConnection(function(err, connection){
-    console.log(err)
     callback(err, connection)
   })
 };
