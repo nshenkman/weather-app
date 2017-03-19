@@ -3,6 +3,7 @@ var sendEmails = function(callback){
   var connection = require('./app').getConnection;
   var wunderground = require('./app').wunderground;
   var nodemailer = require('nodemailer');
+  var smtpTransport = require('nodemailer-smtp-transport');
   var async = require('async');
   var mustache = require('mustache');
   var email =  process.env.EMAIL;
@@ -10,13 +11,13 @@ var sendEmails = function(callback){
   var domain = process.env.DOMAIN;
   console.log(email)
   console.log(pass)
-  var transporter = nodemailer.createTransport({
+  var transporter = nodemailer.createTransport(smtpTransport({
     service: 'gmail',
     auth: {
       user: email,
       pass: pass
     }
-  });
+  }));
 
   var  mailOptions = {
     from: 'Nikita Shenkman'
@@ -27,6 +28,31 @@ var sendEmails = function(callback){
     low : {subject : "Not so nice out? That's okay, enjoy a discount on us.", template : '<p>In {{location_name}} the weather is {{forecast.temp}} degrees and {{forecast.weather}}.</p>'},
     normal : {subject : "Enjoy a discount on us.", template : '<p>In {{location_name}} the weather is {{forecast.temp}} degrees and {{forecast.weather}}.</p>'}
   };
+
+  var getWundergroundData = function(account, callback) {
+    async.parallel({
+      averageForecast : async.apply(wunderground.get, 'almanac', account.location_link),
+      currentForecast : async.apply(wunderground.get, 'conditions', account.location_link)
+    }, function(err, weatherData) {
+      if (err) {
+        callback()
+      } else {
+        if (weatherData.averageForecast.error && weatherData.averageForecast.error.type == 'invalidkey' ||
+          weatherData.currentForecast.error && weatherData.currentForecast.error.type == 'invalidkey') {
+          setTimeout()
+        }
+        var forecast = {};
+        var averageForecast = weatherData.averageForecast.almanac;
+        var currentForecast = weatherData.currentForecast.current_observation;
+        forecast.averageTemp = (Number(averageForecast.temp_high.normal.F) + Number(averageForecast.temp_low.normal.F)) / 2;
+        forecast.weather = currentForecast.weather;
+        forecast.temp = currentForecast.temp_f;
+        account.forecast = forecast;
+        callback(null, account)
+      }
+    })
+  }
+
 
   async.auto(
     {
