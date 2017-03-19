@@ -36,20 +36,22 @@ var sendEmails = function(callback){
     }, function(err, weatherData) {
       if (err) {
         callback()
-      } else {
-        if (weatherData.averageForecast.error && weatherData.averageForecast.error.type == 'invalidkey' ||
+      } else if (weatherData.averageForecast.error && weatherData.averageForecast.error.type == 'invalidkey' ||
           weatherData.currentForecast.error && weatherData.currentForecast.error.type == 'invalidkey') {
-          setTimeout()
+        // Set timeout because Wunderground developer keys allow for only 10 calls per minute or 500 calls per day
+          setTimeout(function(){
+            getWundergroundData(account, callback)
+          },60000)
+        } else {
+          var forecast = {};
+          var averageForecast = weatherData.averageForecast.almanac;
+          var currentForecast = weatherData.currentForecast.current_observation;
+          forecast.averageTemp = (Number(averageForecast.temp_high.normal.F) + Number(averageForecast.temp_low.normal.F)) / 2;
+          forecast.weather = currentForecast.weather;
+          forecast.temp = currentForecast.temp_f;
+          account.forecast = forecast;
+          callback(null, account)
         }
-        var forecast = {};
-        var averageForecast = weatherData.averageForecast.almanac;
-        var currentForecast = weatherData.currentForecast.current_observation;
-        forecast.averageTemp = (Number(averageForecast.temp_high.normal.F) + Number(averageForecast.temp_low.normal.F)) / 2;
-        forecast.weather = currentForecast.weather;
-        forecast.temp = currentForecast.temp_f;
-        account.forecast = forecast;
-        callback(null, account)
-      }
     })
   }
 
