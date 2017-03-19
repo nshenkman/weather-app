@@ -4,7 +4,6 @@
  */
 
 var express = require('express'),
-  cron = require('node-schedule'),
   bodyParser = require('body-parser'),
   methodOverride = require('method-override'),
   morgan = require('morgan'),
@@ -54,8 +53,6 @@ var api = require('./routes/api');
 
 var wunderground = api.wunderground().init(wundergroundApiKey);
 module.exports.wunderground = wunderground;
-
-var sendEmails = require('./sendEmails');
 
 /**
  * Configuration
