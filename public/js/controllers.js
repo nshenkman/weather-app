@@ -11,6 +11,7 @@ angular.module('weatherApp.controllers', [])
     $scope.offset = 0;
     $scope.limit = 6;
     $scope.loading = false;
+    $scope.creatingAccount = false;
 
     $('#subscribeForm').validator({
       custom: {
@@ -69,11 +70,14 @@ angular.module('weatherApp.controllers', [])
     };
 
     $scope.createAccount = function() {
+      $scope.creatingAccount = true;
       $http.post('/api/account', $scope.account, {}).
       success(function (data, status, headers, config) {
+        $scope.creatingAccount = false;
         $scope.success = true
       }).
       error(function (data, status, headers, config) {
+        $scope.creatingAccount = false;
         $scope.error = true;
       });
     };

@@ -55,7 +55,7 @@
                 <li type="page-item" ng-class="{'disabled': cities.length <= limit  + offset}" ><a class="page-link" href="#" ng-click="nextPage()">Next</a></li>
             </ul>
             <div class="form-group" >
-                <button type="submit" class="btn btn-primary v-center" ng-click="createAccount()">Subscribe</button>
+                <button type="submit" class="btn btn-primary v-center" ng-click="createAccount()" ng-disabled="creatingAccount">Subscribe</button>
             </div>
         </div>
     </form>
@@ -63,8 +63,8 @@
 <div ng-show="success" class="App container">
     <h2><b>{{account.email}}</b> successfully subscribed to daily weather notifications for <b>{{city.name}}</b></h2>
 </div>
-<div ng-show="error" class="App container">
-    <h2>Unfortunately an error occured. Please refresh the page and try again</h2>
+<div ng-show="error && !success" class="App container">
+    <h2>Unfortunately an error occurred. Please refresh the page and try again</h2>
 </div>
 </body>
 </html>
