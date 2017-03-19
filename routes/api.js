@@ -73,7 +73,6 @@ exports.account  =
           if (req.query.email) {
             var email = req.query.email;
             connection.query('DELETE FROM weather_app.accounts WHERE email = ?', email, function (err, results) {
-              console.log(results.affectedRows)
               if (results.affectedRows == 0) {
                 callback(404, null)
               } else {
@@ -90,7 +89,7 @@ exports.account  =
           err = typeof err ==='number' ? err : 500;
           var reason;
           if (err == 400) {
-            reason = 'Email paramter missing'
+            reason = 'Email parameter missing'
           } else if (err == 404) {
             reason = 'Email not found'
           } else if (500) {
@@ -98,7 +97,7 @@ exports.account  =
           }
           res.status(err).send({status : 'failed', reason : reason})
         } else {
-          res.status(300).send({status : 'success'})
+          res.status(200).send({status : 'success'})
         }
       })
     }
