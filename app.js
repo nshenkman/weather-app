@@ -15,13 +15,10 @@ var express = require('express'),
 var app = module.exports = express();
 
 var env = process.env.NODE_ENV || 'local';
-var email =  process.env.EMAIL;
-var pass =  process.env.PASS;
 var host = process.env.DB_HOST;
 var dbUser = process.env.DB_USER;
 var dbPass = process.env.DB_PASS;
 var wundergroundApiKey = process.env.WUNDERGROUND_API_KEY;
-var domain = process.env.DOMAIN;
 
 
 var dbOptions = {
@@ -97,14 +94,5 @@ app.get('*', routes.index);
 
 http.createServer(app).listen(app.get('port'), function () {
   console.log('Express server listening on port ' + app.get('port'));
-});
-
-var rule = new cron.RecurrenceRule();
-//EAST COAST TIME
-rule.hour = 8;
-cron.scheduleJob(rule, function(){
-  sendEmails.sendEmails(email, pass, domain, function(err, res) {
-    console.log(err)
-  })
 });
 

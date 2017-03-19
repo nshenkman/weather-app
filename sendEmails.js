@@ -1,10 +1,14 @@
 'use strict';
-exports.sendEmails = function(email, pass, domain, callback){
+var sendEmails = function(callback){
   var connection = require('./app').getConnection;
   var wunderground = require('./app').wunderground;
   var nodemailer = require('nodemailer');
   var async = require('async');
   var mustache = require('mustache');
+  var email =  process.env.EMAIL;
+  var pass =  process.env.PASS;
+  var domain = process.env.DOMAIN;
+
   var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -22,8 +26,6 @@ exports.sendEmails = function(email, pass, domain, callback){
     low : {subject : "Not so nice out? That's okay, enjoy a discount on us.", template : '<p>In {{location_name}} the weather is {{forecast.temp}} degrees and {{forecast.weather}}.</p>'},
     normal : {subject : "Enjoy a discount on us.", template : '<p>In {{location_name}} the weather is {{forecast.temp}} degrees and {{forecast.weather}}.</p>'}
   };
-
-  var unsubscribe = '<p style="font-size:8px;">If you are no longer interested, you can <a href="'+domain+'/api/account/unsubscribe">unsubscribe</a></p>';
 
   async.auto(
     {
@@ -69,6 +71,7 @@ exports.sendEmails = function(email, pass, domain, callback){
               weatherType = 'low'
             }
             var html = mustache.render(weatherTemplates[weatherType].template, accountWeather);
+            var unsubscribe = '<p style="font-size:8px;">If you are no longer interested, you can <a href="'+domain+'api/account/unsubscribe?email='+accountWeather.email+'">unsubscribe</a></p>';
             html += unsubscribe;
             mailOptions.subject = weatherTemplates[weatherType].subject;
             mailOptions.html = html;
@@ -81,3 +84,7 @@ exports.sendEmails = function(email, pass, domain, callback){
       }]
     }, callback);
 };
+
+sendEmails(function(err){
+  if (err) console.log(err)
+});
