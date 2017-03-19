@@ -8,7 +8,8 @@ var sendEmails = function(callback){
   var email =  process.env.EMAIL;
   var pass =  process.env.PASS;
   var domain = process.env.DOMAIN;
-
+  console.log(email)
+  console.log(pass)
   var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
