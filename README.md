@@ -1,12 +1,12 @@
 # Weather App
 
-This is a simple weather emailing application that allows people to subscribe to a daily weather email notification. The app consists of two parts. One part is the client side which has an AngularJS frontend with a Node.js backend. The front end is a single page app that has two form fields, email and city. All subscribed emails must be unique and there can only be one city to one email. The [Wunderground API](https://www.wunderground.com/weather/api/d/docs "Title") is used to search for cities and deliver forecast information. The backend is responsible for checking whether an email already exists, creating and deleting accounts and grabbing the cities and forecast from the Wunderground API. The cities are limited to US cities only. The second part is the sending email script (sendEmails.js) which is responsible for finding accounts that have not successfully received an email in the last 24 hours, getting the forecasts for the cities connected to the account and sending the email. A log is recorded of each email that tried to get sent and if it was not successfuly, it will try to send the email again the next time the script is called.
+This is a simple weather emailing application that allows people to subscribe to a daily weather email notification. The app consists of two parts. One part is the client side which has an AngularJS frontend with a Node.js backend. The frontend is a single page app that has two form fields, email and city. All subscribed emails must be unique and there can only be one city to one email. The [Wunderground API](https://www.wunderground.com/weather/api/d/docs "Title") is used to search for cities and deliver forecast information. The backend is responsible for checking whether an email already exists, creating and deleting accounts and grabbing the cities and forecast from the Wunderground API. The cities are limited to US cities only. The second part is the sending email script (sendEmails.js) which is responsible for finding accounts that have not successfully received an email in the last 24 hours, getting the forecasts for the cities connected to the account and sending the email. A log is recorded for each email that tries to get sent. If sending the email was unsuccessful, it will try to send the email again the next time the script is called.
 
 
 ### How to use weather-app locally
 1. Clone weather-app
 2. Run `npm install`
-3. Make sure MySQL is install on your local machine
+3. Make sure MySQL is installed on your local machine
 4. Run `mysql < weather_app.sql`
 5. Run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key node app.js`
 6. Your app should be running on `localhost:3000`
@@ -15,10 +15,10 @@ This is a simple weather emailing application that allows people to subscribe to
 run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key node app.js`
 
 ### Running the email script
-Run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key EMAIL=your_email_to_send_from PASS=your_email_password EMAIL_SERVICE=email_service_provide node sendEmails.js`
+Run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key EMAIL=your_email_to_send_from PASS=your_email_password EMAIL_SERVICE=email_service_provider node sendEmails.js`
 
 ### Running in production
-Same steps as running the app and email script but a DB_HOST, DB_USER, DB_PASS and DOMAIN (for the unsubscribe link) must be provided
+Same steps as running the app and email script but a DB_HOST, DB_USER, DB_PASS and DOMAIN (for the unsubscribe link) must be provided.
 
 ### Running tests
 Run `npm test`
