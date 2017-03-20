@@ -12,7 +12,7 @@ This is a simple weather emailing application that allows people to subscribe to
 6. Your app should be running on `localhost:3000`
 
 ### Running the app
-run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key node app.js`
+Run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key node app.js`
 
 ### Running the email script
 Run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key EMAIL=your_email_to_send_from PASS=your_email_password EMAIL_SERVICE=email_service_provider node sendEmails.js`
