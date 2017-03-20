@@ -1,6 +1,6 @@
 # Weather App
 
-This is a simple weather emailing application that allows people to subscribe to a daily weather email notification. The app consists of two parts. One part is the client side which has an AngularJS front end with a Node.js backend. The front end is a single page app that has two form fields, email and city. All subscribed emails must be unique and there can only be one city to one email. The [Wunderground API](https://www.wunderground.com/weather/api/d/docs "Title") is used to search for cities and deliver forecast information. The backend is responsible for checking whether an email already exists, creating and deleting accounts and grabbing the cities and forecast from the Wunderground API. The cities are limited to US cities only. The second part is the sending email script (sendEmails.js) which is responsible for finding accounts that have not successfully received an email in the last 24 hours, getting the forecasts for the cities connected to the account and sending the email. A log is recorded of each email that tried to get sent and if it was not successfuly, it will try to send the email again the next time the script is called.
+This is a simple weather emailing application that allows people to subscribe to a daily weather email notification. The app consists of two parts. One part is the client side which has an AngularJS frontend with a Node.js backend. The front end is a single page app that has two form fields, email and city. All subscribed emails must be unique and there can only be one city to one email. The [Wunderground API](https://www.wunderground.com/weather/api/d/docs "Title") is used to search for cities and deliver forecast information. The backend is responsible for checking whether an email already exists, creating and deleting accounts and grabbing the cities and forecast from the Wunderground API. The cities are limited to US cities only. The second part is the sending email script (sendEmails.js) which is responsible for finding accounts that have not successfully received an email in the last 24 hours, getting the forecasts for the cities connected to the account and sending the email. A log is recorded of each email that tried to get sent and if it was not successfuly, it will try to send the email again the next time the script is called.
 
 
 ### How to use weather-app locally
@@ -15,17 +15,17 @@ This is a simple weather emailing application that allows people to subscribe to
 run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key node app.js`
 
 ### Running the email script
-run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key EMAIL=your_email_to_send_from PASS=your_email_password EMAIL_SERVICE=email_service_provide node sendEmails.js`
+Run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key EMAIL=your_email_to_send_from PASS=your_email_password EMAIL_SERVICE=email_service_provide node sendEmails.js`
 
 ### Running in production
-same steps as running the app and email script but a DB_HOST, DB_USER, DB_PASS and DOMAIN (for the unsubscribe link) must be provided
+Same steps as running the app and email script but a DB_HOST, DB_USER, DB_PASS and DOMAIN (for the unsubscribe link) must be provided
 
 ### Running tests
-run `npm test`
+Run `npm test`
 
 ### API Endpoints
 ##### Accounts
-responsible for creating and deleting accounts as well as checking if an email exists
+Responsible for creating and deleting accounts as well as checking if an email exists
 * **Endpoints**
 POST /api/account
 GET /api/account/unsubscribe
@@ -40,32 +40,29 @@ The email to check if it is already subscribed
 * **Data Params**
 For POST /api/account:
 `{"email":[String], "locationLink":[String], "locationName":[String]}`
-email : an email to send the forecast to.
-locationLink : a wunderground enpoint that coresponds to a city in their API e.g.`/q/zmw:02108.1.99999`.
-locationName : the name of the city matching the locationLink City
+email : An email to send the forecast to.
+locationLink : A wunderground enpoint that coresponds to a city in their API e.g.`/q/zmw:02108.1.99999`.
+locationName : The name of the city matching the locationLink City
 * **Error Response :**
-For POST /api/account
-  * **Code:** 409 CONFLICT
-  * given email already exists
-  OR
-  * **Code:** 400 BAD REQUEST
-  * missing parameters in request
-  OR
-  * **Code:** 500 INTERNAL SERVER ERROR
-  * Internal Server Error
+
+  For POST /api/account
+    * **Code:** 409 CONFLICT
+    * Given email already exists
+    * **Code:** 400 BAD REQUEST
+    * Missing parameters in request
+    * **Code:** 500 INTERNAL SERVER ERROR
+    * Internal Server Error
 
   For GET /api/account/unsubscribe
     * **Code:** 404 NOT FOUND
     * **Content:** `{"status" : "failed" : "reason" : "Email not found"}`
-    OR
     * **Code:** 400 BAD REQUEST
     * **Content:** `{"status" : "failed" : "reason" : "Email parameter missing"}`
-    OR
     * **Code:** 500 INTERNAL SERVER ERROR
     * **Content:** `{"status" : "failed" : "reason" : "Internal server error"}`
 
 ##### Wunderground
-responsible for getting cities from the Wunderground API
+Responsible for getting cities from the Wunderground API
 * **Endpoints**
 GET /api/cities
 *  **URL Params**
@@ -76,9 +73,12 @@ Please refer to the [Wunderground Docs](https://www.wunderground.com/weather/api
 * **Error Response :**
   * **Code:** 500 SERVICE UNAVAILABLE
   * Error from the Wunderground API
-  OR
   * **Code:** 500 INTERNAL SERVER ERROR
   * Internal Server Error
+
+### Example in use
+[Here](https://klaviyo-weather-app.herokuapp.com/ "Title")
+
 
 
 
