@@ -40,29 +40,25 @@ The email to check if it is already subscribed
 * **Data Params**
 For POST /api/account:
 `{"email":[String], "locationLink":[String], "locationName":[String]}`
-
 email : An email to send the forecast to.
-
 locationLink : A wunderground enpoint that coresponds to a city in their API e.g.`/q/zmw:02108.1.99999`.
-
 locationName : The name of the city matching the locationLink City
 * **Error Response :**
-
   For POST /api/account
     * **Code:** 409 CONFLICT
-    * Given email already exists
+    Given email already exists
     * **Code:** 400 BAD REQUEST
-    * Missing parameters in request
+    Missing parameters in request
     * **Code:** 500 INTERNAL SERVER ERROR
-    * Internal Server Error
+    Internal Server Error
 
   For GET /api/account/unsubscribe
     * **Code:** 404 NOT FOUND
-    * **Content:** `{"status" : "failed" : "reason" : "Email not found"}`
+    **Content:** `{"status" : "failed" : "reason" : "Email not found"}`
     * **Code:** 400 BAD REQUEST
-    * **Content:** `{"status" : "failed" : "reason" : "Email parameter missing"}`
+    **Content:** `{"status" : "failed" : "reason" : "Email parameter missing"}`
     * **Code:** 500 INTERNAL SERVER ERROR
-    * **Content:** `{"status" : "failed" : "reason" : "Internal server error"}`
+    **Content:** `{"status" : "failed" : "reason" : "Internal server error"}`
 
 ##### Wunderground
 Responsible for getting cities from the Wunderground API
@@ -75,13 +71,9 @@ the query to use to search for cities e.g. Bosto
 Please refer to the [Wunderground Docs](https://www.wunderground.com/weather/api/d/docs?d=autocomplete-api "Title") for responses.
 * **Error Response :**
   * **Code:** 500 SERVICE UNAVAILABLE
-  * Error from the Wunderground API
+  Error from the Wunderground API
   * **Code:** 500 INTERNAL SERVER ERROR
-  * Internal Server Error
+  Internal Server Error
 
 ### Example in use
 [Here](https://klaviyo-weather-app.herokuapp.com/ "Title")
-
-
-
-
