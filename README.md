@@ -7,7 +7,7 @@ This is a simple weather emailing application that allows people to subscribe to
 1. Clone weather-app
 2. Run `npm install`
 3. Make sure MySQL is install on your local machine
-4. Run `mysql --host=localhost --user=your_username_or_ROOT --password=your_password_if_applicable  -e "weather_app.sql"`
+4. Run `mysql < weather_app.sql`
 5. Run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key node app.js`
 6. Your app should be running on `localhost:3000`
 
@@ -40,8 +40,11 @@ The email to check if it is already subscribed
 * **Data Params**
 For POST /api/account:
 `{"email":[String], "locationLink":[String], "locationName":[String]}`
+
 email : An email to send the forecast to.
+
 locationLink : A wunderground enpoint that coresponds to a city in their API e.g.`/q/zmw:02108.1.99999`.
+
 locationName : The name of the city matching the locationLink City
 * **Error Response :**
 
