@@ -1,81 +1,84 @@
-# Angular Express Seed
+# Weather App
 
-Start an awesome app with AngularJS on the front, Express + Node on the back. This project is an
-application skeleton for a typical [AngularJS](http://angularjs.org/) web app for those who want
-to use Node to serve their app.
+This is a simple weather emailing application that allows people to subscribe to a daily weather email notification. The app consists of two parts. One part is the client side which has an AngularJS front end with a Node.js backend. The front end is a single page app that has two form fields, email and city. All subscribed emails must be unique and there can only be one city to one email. The [Wunderground API](https://www.wunderground.com/weather/api/d/docs "Title") is used to search for cities and deliver forecast information. The backend is responsible for checking whether an email already exists, creating and deleting accounts and grabbing the cities and forecast from the Wunderground API. The cities are limited to US cities only. The second part is the sending email script (sendEmails.js) which is responsible for finding accounts that have not successfully received an email in the last 24 hours, getting the forecasts for the cities connected to the account and sending the email. A log is recorded of each email that tried to get sent and if it was not successfuly, it will try to send the email again the next time the script is called.
 
-The seed contains angular libraries, test libraries and a bunch of scripts all preconfigured for
-instant web development gratification. Just clone the repo (or download the zip/tarball) and
-you're ready to develop your application.
 
-The seed app shows how to wire together Angular client-side components with Express on the server.
-It also illustrates writing angular partials/views with the Jade templating library.
-
-_Note: Although Jade supports interpolation, you should be doing that mostly on the client. Mixing
-server and browser templating will convolute your app. Instead, use Jade as a syntactic sugar for
-HTML, and let AngularJS take care of interpolation on the browser side._
-
-## How to use angular-express-seed
-
-Clone the angular-express-seed repository, run `npm install` to grab the dependencies, and start hacking!
+### How to use weather-app locally
+1. Clone weather-app
+2. Run `npm install`
+3. Make sure MySQL is install on your local machine
+4. Run `mysql --host=localhost --user=your_username_or_ROOT --password=your_password_if_applicable  -e "weather_app.sql"`
+5. Run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key node app.js`
+6. Your app should be running on `localhost:3000`
 
 ### Running the app
+run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key node app.js`
 
-Runs like a typical express app:
+### Running the email script
+run `NODE_ENV=local WUNDERGROUND_API_KEY=your_wunderground_api_key EMAIL=your_email_to_send_from PASS=your_email_password EMAIL_SERVICE=email_service_provide node sendEmails.js`
 
-    node app.js
+### Running in production
+same steps as running the app and email script but a DB_HOST, DB_USER, DB_PASS and DOMAIN (for the unsubscribe link) must be provided
 
 ### Running tests
+run `npm test`
 
-Coming soon!
+### API Endpoints
+##### Accounts
+responsible for creating and deleting accounts as well as checking if an email exists
+* **Endpoints**
+POST /api/account
+GET /api/account/unsubscribe
+GET /api/email-check
+*  **URL Params**
+For GET /api/account/unsubscribe
+`email=[String]`
+The email to unsubscribe
+For GET /api/email-check
+`email=[String]`
+The email to check if it is already subscribed
+* **Data Params**
+For POST /api/account:
+`{"email":[String], "locationLink":[String], "locationName":[String]}`
+email : an email to send the forecast to.
+locationLink : a wunderground enpoint that coresponds to a city in their API e.g.`/q/zmw:02108.1.99999`.
+locationName : the name of the city matching the locationLink City
+* **Error Response :**
+For POST /api/account
+  * **Code:** 409 CONFLICT
+  * given email already exists
+  OR
+  * **Code:** 400 BAD REQUEST
+  * missing parameters in request
+  OR
+  * **Code:** 500 INTERNAL SERVER ERROR
+  * Internal Server Error
 
-### Receiving updates from upstream
+  For GET /api/account/unsubscribe
+    * **Code:** 404 NOT FOUND
+    * **Content:** `{"status" : "failed" : "reason" : "Email not found"}`
+    OR
+    * **Code:** 400 BAD REQUEST
+    * **Content:** `{"status" : "failed" : "reason" : "Email parameter missing"}`
+    OR
+    * **Code:** 500 INTERNAL SERVER ERROR
+    * **Content:** `{"status" : "failed" : "reason" : "Internal server error"}`
 
-Just fetch the changes and merge them into your project with git.
-
-
-## Directory Layout
-    
-    app.js              --> app config
-    package.json        --> for npm
-    public/             --> all of the files to be used in on the client side
-      css/              --> css files
-        app.css         --> default stylesheet
-      img/              --> image files
-      js/               --> javascript files
-        app.js          --> declare top-level app module
-        controllers.js  --> application controllers
-        directives.js   --> custom angular directives
-        filters.js      --> custom angular filters
-        services.js     --> custom angular services
-        lib/            --> angular and 3rd party JavaScript libraries
-          angular/
-            angular.js            --> the latest angular js
-            angular.min.js        --> the latest minified angular js
-            angular-*.js          --> angular add-on modules
-            version.txt           --> version number
-    routes/
-      api.js            --> route for serving JSON
-      index.js          --> route for serving HTML pages and partials
-    views/
-      index.jade        --> main page for app
-      layout.jade       --> doctype, title, head boilerplate
-      partials/         --> angular view partials (partial jade templates)
-        partial1.jade
-        partial2.jade
+##### Wunderground
+responsible for getting cities from the Wunderground API
+* **Endpoints**
+GET /api/cities
+*  **URL Params**
+`query=[String]`
+the query to use to search for cities e.g. Bosto
+* **Successful Response:**
+Please refer to the [Wunderground Docs](https://www.wunderground.com/weather/api/d/docs?d=autocomplete-api "Title") for responses.
+* **Error Response :**
+  * **Code:** 500 SERVICE UNAVAILABLE
+  * Error from the Wunderground API
+  OR
+  * **Code:** 500 INTERNAL SERVER ERROR
+  * Internal Server Error
 
 
 
-## Example App
-
-A simple [blog](https://github.com/btford/angular-express-blog) based on this seed.
-
-
-## Contact
-
-For more information on AngularJS please check out http://angularjs.org/
-For more on Express and Jade, http://expressjs.com/ and http://jade-lang.com/ are
-your friends.
-
-## License
-MIT

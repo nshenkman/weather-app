@@ -9,8 +9,14 @@ var sendEmails = function(callback){
   var email =  process.env.EMAIL;
   var pass =  process.env.PASS;
   var domain = process.env.DOMAIN;
+  var emailSerivce = process.env.EMAIL_SERVICE || 'gmail';
+
+  if (!domain && process.env.NODE_ENV == 'local') {
+    var port = process.env.PORT || 3000;
+    domain = 'localhost:' + port + '/'
+  }
   var transporter = nodemailer.createTransport(smtpTransport({
-    service: 'gmail',
+    service: emailSerivce,
     auth: {
       user: email,
       pass: pass
