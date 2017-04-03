@@ -2,6 +2,8 @@
 var sendEmails = function(callback){
   var connection = require('./app').getConnection;
   var wunderground = require('./app').wunderground;
+  var cacheClient = require('./app').cacheClient;
+
   var nodemailer = require('nodemailer');
   var smtpTransport = require('nodemailer-smtp-transport');
   var async = require('async');
@@ -15,6 +17,9 @@ var sendEmails = function(callback){
     var port = process.env.PORT || 3000;
     domain = 'localhost:' + port + '/'
   }
+  var useCache = !!cacheClient;
+
+
   var transporter = nodemailer.createTransport(smtpTransport({
     service: emailSerivce,
     auth: {
@@ -33,31 +38,36 @@ var sendEmails = function(callback){
     normal : {subject : "Enjoy a discount on us.", weatherUrl : 'https://s3.amazonaws.com/nshenkmanweatherapp/cloudy.png'}
   };
 
+
   var getWundergroundData = function(account, callback) {
-    async.parallel({
-      averageForecast : async.apply(wunderground.get, 'almanac', account.location_link),
-      currentForecast : async.apply(wunderground.get, 'conditions', account.location_link)
-    }, function(err, weatherData) {
-      if (err) {
-        recordLog(account, 0, 'Error receiving data from Wunderground', callback);
-      } else if (weatherData.averageForecast.error && weatherData.averageForecast.error.type == 'invalidkey' ||
-        weatherData.currentForecast.error && weatherData.currentForecast.error.type == 'invalidkey') {
-        // Set timeout because Wunderground developer keys allow for only 10 calls per minute or 500 calls per day
-        setTimeout(function(){
-          getWundergroundData(account, callback)
-        },60000)
-      } else {
-        var forecast = {};
-        var averageForecast = weatherData.averageForecast.almanac;
-        var currentForecast = weatherData.currentForecast.current_observation;
-        forecast.averageTemp = (Number(averageForecast.temp_high.normal.F) + Number(averageForecast.temp_low.normal.F)) / 2;
-        forecast.weather = currentForecast.weather;
-        forecast.temp = currentForecast.temp_f;
-        forecast.url = currentForecast.forecast_url;
-        account.forecast = forecast;
-        callback(null, account)
-      }
-    })
+      async.parallel({
+        averageForecast: async.apply(wunderground.get, 'almanac', account.location_link),
+        currentForecast: async.apply(wunderground.get, 'conditions', account.location_link)
+      }, function (err, weatherData) {
+        if (err) {
+          recordLog(account, 0, 'Error receiving data from Wunderground', callback);
+        } else if (weatherData.averageForecast.error && weatherData.averageForecast.error.type == 'invalidkey' ||
+          weatherData.currentForecast.error && weatherData.currentForecast.error.type == 'invalidkey') {
+          // Set timeout because Wunderground developer keys allow for only 10 calls per minute or 500 calls per day
+          setTimeout(function () {
+            getWundergroundData(account, callback)
+          }, 60000)
+        } else {
+          var forecast = {};
+          var averageForecast = weatherData.averageForecast.almanac;
+          var currentForecast = weatherData.currentForecast.current_observation;
+          forecast.averageTemp = (Number(averageForecast.temp_high.normal.F) + Number(averageForecast.temp_low.normal.F)) / 2;
+          forecast.weather = currentForecast.weather;
+          forecast.temp = currentForecast.temp_f;
+          forecast.url = currentForecast.forecast_url;
+          account.forecast = forecast;
+          // store in cache for future uses but expire after 3 hours because weather could change
+          cacheClient.set(account.location_link, JSON.stringify(forecast), function(err, forecast) {
+            //potentially record a failure to cache
+            callback(null, account)
+          }, 10800);
+        }
+      })
   };
 
   var recordLog = function(account, success, info, callback) {
@@ -96,7 +106,22 @@ var sendEmails = function(callback){
       }],
       getWeatherData : ['findAccounts', function(results, callback) {
         var accounts = results.findAccounts;
-        async.map(accounts, getWundergroundData, callback)
+        async.map(accounts, function(account, callback) {
+          if (useCache) {
+            cacheClient.get(account.location_link, function(err, forecast) {
+              if (err || !forecast) {
+                // location is not in cache
+                getWundergroundData(account, callback)
+              } else {
+                account.forecast = JSON.parse(forecast);
+                callback(null, account)
+              }
+            });
+          } else {
+            // no cacheClient
+            getWundergroundData(account, callback)
+          }
+        }, callback)
       }],
       sendEmails : ['getWeatherData', function(results, callback) {
         async.each(results.getWeatherData, function(accountWeather, callback){

@@ -9,7 +9,9 @@ var express = require('express'),
   morgan = require('morgan'),
   http = require('http'),
   path = require('path'),
-  mysql = require('mysql');
+  mysql = require('mysql'),
+  memjs = require('memjs');
+
 
 var app = module.exports = express();
 
@@ -18,7 +20,9 @@ var host = process.env.DB_HOST;
 var dbUser = process.env.DB_USER;
 var dbPass = process.env.DB_PASS;
 var wundergroundApiKey = process.env.WUNDERGROUND_API_KEY;
-
+var cacheServers = process.env.MEMCACHIER_SERVERS;
+var cacheUsername =  process.env.MEMCACHIER_USERNAME;
+var cachePassword = process.env.MEMCACHIER_PASSWORD;
 
 var dbOptions = {
   database : 'weather_app',
@@ -31,7 +35,6 @@ if (env === 'local' || env === 'test') {
   dbOptions.port = 3307;
 }
 
-
 // production only
 if (env === 'production') {
   dbOptions.host = host;
@@ -41,11 +44,16 @@ if (env === 'production') {
 
 var pool = mysql.createPool(dbOptions);
 
+if (cacheServers && cacheUsername && cachePassword) {
+  module.exports.cacheClient = memjs.Client.create();
+}
+
 module.exports.getConnection =  function(callback) {
   pool.getConnection(function(err, connection){
     callback(err, connection)
   })
 };
+
 
 
 var routes = require('./routes');
